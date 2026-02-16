@@ -8,6 +8,8 @@ def evaluate_condition(row, condition):
     column=value
     column>value
     column<value
+    column>=value    (NEW)
+    column<=value    (NEW)
     AND / OR logic
     """
 
@@ -19,9 +21,23 @@ def evaluate_condition(row, condition):
         parts = condition.split(" OR ")
         return any(evaluate_condition(row, part) for part in parts)
 
+    # NEW: Handle >= operator
+    if ">=" in condition:
+        col, val = condition.split(">=")
+        return float(row[col.strip()]) >= float(val.strip())
+
+    # NEW: Handle <= operator
+    if "<=" in condition:
+        col, val = condition.split("<=")
+        return float(row[col.strip()]) <= float(val.strip())
+
     if "=" in condition:
         col, val = condition.split("=")
-        return row[col.strip()] == val.strip()
+        # Check if it's numeric comparison
+        try:
+            return float(row[col.strip()]) == float(val.strip())
+        except ValueError:
+            return row[col.strip()] == val.strip()
 
     if ">" in condition:
         col, val = condition.split(">")
@@ -72,7 +88,7 @@ def execute_query(query):
 if __name__ == "__main__":
     print("Advanced Mini SQL Engine")
     print("Example:")
-    print("SELECT name,age FROM data WHERE age>25 AND city=London ORDER BY age DESC LIMIT 2")
+    print("SELECT name,age FROM data WHERE age>=25 AND age<=30 ORDER BY age DESC LIMIT 2")
 
     query = input("Enter query: ")
 
